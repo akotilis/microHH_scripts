@@ -12,12 +12,9 @@ with nc.Dataset(file) as ncf:
 	x = ncf.variables['x'][:]
 	y = ncf.variables['y'][:]
 	time = ncf.variables['time'][:]
-	z = 10
-	#vmin = 302.5
-	#vmax = 303
 	vmin, vmax = np.ma.min(s), np.ma.max(s)
 	level_boundaries = np.linspace(vmin,vmax,200)
-for i, vel in enumerate(s):
+for i in enumerate(s):
 		
     fig, ax = plt.subplots()
     X,Y = np.meshgrid(x,y)
