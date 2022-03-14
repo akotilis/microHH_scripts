@@ -3,7 +3,7 @@ import netCDF4 as nc
 import matplotlib.pyplot as plt
 
 start = 0
-end = 19
+end = 73
 step = 2
 
 stats = nc.Dataset('fireles.default.0000000.nc', 'r')
@@ -27,7 +27,14 @@ sgradt = thermo.variables['thv_grad'][start:end, :]  #Gradient of the Liquid wat
 sql = thermo.variables['ql'][start:end, :]          #Liquid water
 sthl = thermo.variables['thl'][start:end, :]        #Liquid water potential temperature
 sqt = thermo.variables['qt'][start:end, :]          #Total water mixing ratio
-area = default.variables['area'][start:end, :]
+areat = default.variables['area'][start:end, :]
+sqlpath = thermo.variables['ql_path'][start:end]
+area = np.mean(areat[start:end,:], 0)
+cft = thermo.variables["ql_frac"][start:end]
+
+ql = np.sum(areat[start:end,:]*sql[start:end,:], 0) / np.sum(areat[start:end,:], 0)
+cf = np.sum(areat[start:end,:]*cft[start:end,:], 0) / np.sum(areat[start:end,:], 0)
+
 
 
 s = np.mean(st, axis=0)
@@ -50,6 +57,29 @@ for n in range(t.size):
     wstart[n] = ((9.81/300.)*sfluxt[n, 0]*ht[n])**(1./3.)
 
 plt.close('all')
+
+plt.figure()
+#for n in range(start,end):
+#	plt.plot(sql[n,:], z)
+plt.plot(ql*10**3, z)
+plt.xlabel(r'q$_l$ [kg~kg$^{-1}$]')
+plt.ylabel(r'z [m]')
+plt.title('Liquid water')
+
+
+plt.figure()
+for n in range(start,end):
+	plt.plot(areat[n,:],z, color='#eeeeee')
+plt.plot(area, z)
+plt.xlabel(r'area coverage [-]')
+plt.ylabel(r'z [m]')
+
+plt.figure()
+for n in range(start,end):
+	plt.plot(cft[n,:],z, color='#eeeeee')
+plt.plot(cf, z)
+plt.xlabel(r'cloud fraction [-]')
+plt.ylabel(r'z [m]')
 '''
 plt.figure()
 for n in range(start, end, step):
@@ -105,8 +135,8 @@ for n in range(start, end, step):
     plt.plot(area[n, :], z)
 plt.xlabel(r'$Area [\%]$')
 plt.ylabel(r'$z [m]$')
-
 '''
+
 
 '''
 plt.figure()
@@ -119,9 +149,31 @@ plt.xlabel(r'$\overline{w\theta} [K m s^{-1}]$')
 plt.ylabel(r'$z [m]$')
 '''
 plt.figure()
-plt.plot(np.mean(sqt[-5:-1, :], 0), z, 'b-')
+plt.plot(np.mean(sqt[61:-1, :], 0), z, 'b-', label='mean over t=18000-21600s')
+plt.plot(sqt[61,:], z, 'r-', alpha=0.3, label='t=18000s')
+plt.plot(sqt[-1,:], z, 'r--', alpha=0.3, label='t=21600s')
+plt.title("Total water mixing ratio")
 plt.xlabel(r'$q_t [kg kg^{-1}]$')
 plt.ylabel(r'$z [m]$')
+plt.legend()
+plt.figure()
+plt.plot(np.mean(sthl[61:-1, :], 0), z, 'b-', label='mean over t=18000-21600s')
+plt.plot(sthl[61,:], z, 'r-', alpha=0.3, label='t=18000s')
+plt.plot(sthl[-1,:], z, 'r--', alpha=0.3, label='t=21600s')
+plt.title("Liquid water potential temperature")
+plt.xlabel(r'$\theta_l [K]$')
+plt.ylabel(r'$z [m]$')
+plt.legend()
+#plt.fill_between(sthl[61,:], sthl[72,:], where = (sthl[61,:]<sthl[72,:]))
+
+
+#plt.figure(2)
+#for n in range(61, end, step):
+#    plt.plot(sthl[n, :], z)
+#plt.xlabel(r'$\theta [K]$')
+#plt.ylabel(r'$z [m]$')
+
+
 '''
 plt.figure()
 plt.plot(t, ht)
