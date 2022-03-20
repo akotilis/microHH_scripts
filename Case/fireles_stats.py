@@ -3,40 +3,40 @@ import netCDF4 as nc
 import matplotlib.pyplot as plt
 
 start = 0
-end = 73
+end = 91
 step = 2
 
-stats = nc.Dataset('fireles.ql.0000000.nc', 'r')
+stats = nc.Dataset('fireles.default.0000000.nc', 'r')
 default = stats.groups['default']
 thermo = stats.groups['thermo']
 
-t = stats.variables['time'][start:end]
+t = stats.variables['time'][:]
 z = stats.variables['z'][:]
 zh = stats.variables['zh'][:]
 
-st = thermo.variables['thv'][start:end, :]
-evisct = default.variables['evisc'][start:end, :]   #Eddy viscosity
-u2t = default.variables['u_2'][start:end, :]
-v2t = default.variables['v_2'][start:end, :]
-w2t = default.variables['w_2'][start:end, :]
-s2t = thermo.variables['thv_2'][start:end, :]
-sturbt = thermo.variables['thl_w'][start:end, :]     #Turbulent flux of the Liquid water potential temperature
-sdifft = thermo.variables['thv_diff'][start:end, :]  #Diffusive flux of the Liquid water potential temperature
-sfluxt = thermo.variables['thv_flux'][start:end, :]  #Total flux of the Liquid water potential temperature
-sgradt = thermo.variables['thv_grad'][start:end, :]  #Gradient of the Liquid water potential temperature
-sql = thermo.variables['ql'][start:end, :]*1000          #Liquid water
-sthl = thermo.variables['thl'][start:end, :]        #Liquid water potential temperature
-sqt = thermo.variables['qt'][start:end, :]          #Total water mixing ratio
-area = default.variables['area'][start:end, :]
-sqlpath = thermo.variables['ql_path'][start:end]
-#area = np.mean(areat[start:end,:], 0)
-cft = thermo.variables["ql_frac"][start:end]
-snr = thermo.variables["nr_path"][start:end]
+st = thermo.variables['thv'][:, :]
+evisct = default.variables['evisc'][:, :]   #Eddy viscosity
+u2t = default.variables['u_2'][:, :]
+v2t = default.variables['v_2'][:, :]
+w2t = default.variables['w_2'][:, :]
+s2t = thermo.variables['thv_2'][:, :]
+sturbt = thermo.variables['thl_w'][:, :]     #Turbulent flux of the Liquid water potential temperature
+sdifft = thermo.variables['thv_diff'][:, :]  #Diffusive flux of the Liquid water potential temperature
+sfluxt = thermo.variables['thv_flux'][:, :]  #Total flux of the Liquid water potential temperature
+sgradt = thermo.variables['thv_grad'][:, :]  #Gradient of the Liquid water potential temperature
+sql = thermo.variables['ql'][:, :]*1000          #Liquid water
+sthl = thermo.variables['thl'][:, :]        #Liquid water potential temperature
+sqt = thermo.variables['qt'][:, :]          #Total water mixing ratio
+area = default.variables['area'][:, :]
+sqlpath = thermo.variables['ql_path'][:]
+#area = np.mean(areat[:,:], 0)
+cft = thermo.variables["ql_frac"][:]
+snr = thermo.variables["nr_path"][:]
 
-aream = np.mean(area[start:end,:], 0)
+aream = np.mean(area[:,:], 0)
 
-ql = np.sum(area[start:end,:]*sql[start:end,:], 0) / np.sum(area[start:end,:], 0)
-cf = np.sum(area[start:end,:]*cft[start:end,:], 0) / np.sum(area[start:end,:], 0)
+ql = np.sum(area[:,:]*sql[:,:], 0) / np.sum(area[:,:], 0)
+cf = np.sum(area[:,:]*cft[:,:], 0) / np.sum(area[:,:], 0)
 areaql = area[:,:]*sql[:,:]
 
 
@@ -101,10 +101,17 @@ plt.figure()
 #for n in range(start,end):
 #	plt.plot(t[:,n], sqlpath[n,:], color='#eeeeee')
 plt.plot(t, sqlpath, 'b-', label = 'liquid water time series')
-plt.plot(t, sqlpath1d, 'b:', label='interpolated')
+#plt.plot(t, sqlpath1d, 'b:', label='interpolated')
 plt.xlabel('time[s]')
 plt.ylabel('q$_l$ [g~kg$^{-1}$]')
 plt.title('Liquid water path')
+plt.legend()
+
+plt.figure()
+plt.plot(t, snr, 'b-', label = 'number density rain')
+plt.xlabel('time[s]')
+plt.ylabel('n$_r$ [g~kg$^{-1}$]')
+plt.title('NDR time series')
 plt.legend()
 
 
