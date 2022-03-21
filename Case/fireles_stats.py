@@ -97,17 +97,17 @@ plt.title('Liquid water')
 plt.legend()
 
 
-plt.figure()
+plt.figure(figsize=(10,5))
 #for n in range(start,end):
 #	plt.plot(t[:,n], sqlpath[n,:], color='#eeeeee')
 plt.plot(t, sqlpath, 'b-', label = 'liquid water time series')
 #plt.plot(t, sqlpath1d, 'b:', label='interpolated')
 plt.xlabel('time[s]')
 plt.ylabel('q$_l$ [g~kg$^{-1}$]')
-plt.title('Liquid water path')
+plt.title('')
 plt.legend()
 
-plt.figure()
+plt.figure(figsize=(10,5))
 plt.plot(t, snr, 'b-', label = 'number density rain')
 plt.xlabel('time[s]')
 plt.ylabel('n$_r$ [g~kg$^{-1}$]')
