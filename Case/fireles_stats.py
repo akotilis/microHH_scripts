@@ -36,6 +36,7 @@ plt.close('all')
 #plt.rc('font',**{'family':'serif','serif':['Palatino']})
 #plt.rc('text', usetex=True)
 start, end = 0, len(t)
+
 cft[cft==0] = np.nan
 cf[cf==0] = np.nan
 sql[sql==0] = np.nan
@@ -59,14 +60,23 @@ plt.legend()
 
 
 plt.figure(figsize=(10,5))
-#for n in range(start,end):
-#	plt.plot(t[:,n], sqlpath[n,:], color='#eeeeee')
 plt.plot(t, sqlpath, 'b-', label = 'liquid water')
 #plt.plot(t, sqlpath1d, 'b:', label='interpolated')
 plt.xlabel('time[s]')
 plt.ylabel('q$_l$ [g~kg$^{-1}$]')
 plt.title('LWP')
 plt.legend()
+
+
+plt.figure(figsize=(10,5))
+plt.plot(t, trr, 'b-', label = 'mean surface rain rate')
+plt.xlabel('time[s]')
+plt.ylabel('mean surface rain rate [kg m$^{-2}s^{-1}$]')
+plt.title('Mean surface rain rate')
+plt.legend()
+
+
+'''
 
 plt.figure(figsize=(10,5))
 plt.plot(t, snr, 'b-', label = 'number density rain')
@@ -75,7 +85,6 @@ plt.ylabel('n$_r$ [g~kg$^{-1}$]')
 plt.title('NDR')
 plt.legend()
 
-'''
 plt.figure()
 plt.plot(np.mean(sqt[60:-1, :], 0), z, 'b-', label='mean over t=18000-21600s')
 #plt.plot(np.std(sqt[0:-1, :], 0), z, 'r--',label='std t=18000-21600s')
