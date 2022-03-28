@@ -24,6 +24,7 @@ sqlpath = thermo.variables['ql_path'][:]
 area = np.mean(areat[:,:], 0)
 cft = thermo.variables["ql_frac"][:]
 snr = thermo.variables["nr_path"][:]
+trr = thermo.variables["rr"][:] *10**3 #to mm/s
 ql = np.sum(areat[:,:]*sql[:,:], 0) / np.sum(areat[:,:], 0)
 cf = np.sum(areat[:,:]*cft[:,:], 0) / np.sum(areat[:,:], 0)
 
@@ -71,7 +72,7 @@ plt.legend()
 plt.figure(figsize=(10,5))
 plt.plot(t, trr, 'b-', label = 'mean surface rain rate')
 plt.xlabel('time[s]')
-plt.ylabel('mean surface rain rate [kg m$^{-2}s^{-1}$]')
+plt.ylabel('mean surface rain rate [mm s$^{-1}$]')
 plt.title('Mean surface rain rate')
 plt.legend()
 
