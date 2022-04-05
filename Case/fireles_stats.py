@@ -16,21 +16,22 @@ u2t = default.variables['u_2'][:, :]
 v2t = default.variables['v_2'][:, :]
 w2t = default.variables['w_2'][:, :]
 s2t = thermo.variables['thv_2'][:, :]
-sql = thermo.variables['ql'][:, :]          #Liquid water
+sql = thermo.variables['ql'][:, :]          #Liquid water [kg kg-1]
 sthl = thermo.variables['thl'][:, :]        #Liquid water potential temperature
 sqt = thermo.variables['qt'][:, :]          #Total water mixing ratio
 areat = default.variables['area'][:, :]
-sqlpath = thermo.variables['ql_path'][:]
+sqlpath = thermo.variables['ql_path'][:]    #[kg m-2]
 area = np.mean(areat[:,:], 0)
 cft = thermo.variables["ql_frac"][:]
 snr = thermo.variables["nr_path"][:]
-trr = thermo.variables["rr"][:] *10**3 #to mm/s
+trr = thermo.variables["rr"][:]
 ql = np.sum(areat[:,:]*sql[:,:], 0) / np.sum(areat[:,:], 0)
 cf = np.sum(areat[:,:]*cft[:,:], 0) / np.sum(areat[:,:], 0)
 
 
-
-
+sql = sql*10**6 #to g m-3
+trr = trr*10**3 #to mm/s
+sqlpath = sqlpath*10**3 #to g m-2
 
 plt.close('all')
 # enable LaTeX plotting
@@ -54,17 +55,17 @@ for n in range(start,end):
 	plt.plot(sql[n,:], z, color='#eeeeee')
 plt.plot(np.nanmean(sql[:, :], 0),z, label='mean')
 #plt.plot(np.std(sql[0:-1, :], 0),z, label='std')
-plt.xlabel('q$_l$ [g~kg$^{-1}$]')
+plt.xlabel('q$_l$ [g m$^{-3}$]')
 plt.ylabel('z [m]')
 plt.title('Liquid water')
 plt.legend()
 
 
 plt.figure(figsize=(10,5))
-plt.plot(t, sqlpath, 'b-', label = 'liquid water')
+plt.plot(t, sqlpath, 'b-', label = 'liquid water path')
 #plt.plot(t, sqlpath1d, 'b:', label='interpolated')
 plt.xlabel('time[s]')
-plt.ylabel('q$_l$ [g~kg$^{-1}$]')
+plt.ylabel('q$_l$ [g m$^{-2}$]')
 plt.title('LWP')
 plt.legend()
 
@@ -82,7 +83,7 @@ plt.legend()
 plt.figure(figsize=(10,5))
 plt.plot(t, snr, 'b-', label = 'number density rain')
 plt.xlabel('time[s]')
-plt.ylabel('n$_r$ [g~kg$^{-1}$]')
+plt.ylabel('n$_r$ [kg m$^{-5}$]')
 plt.title('NDR')
 plt.legend()
 
