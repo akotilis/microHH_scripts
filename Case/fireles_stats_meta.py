@@ -11,21 +11,17 @@ t = stats.variables['time'][:]
 z = stats.variables['z'][:]
 zh = stats.variables['zh'][:]
 
-st = thermo.variables['thv'][:, :]
-u2t = default.variables['u_2'][:, :]
-v2t = default.variables['v_2'][:, :]
-w2t = default.variables['w_2'][:, :]
-s2t = thermo.variables['thv_2'][:, :]
+thlf = thermo.variables['thl_flux'][:, :]  #flux of the Liq water potential temperature[K m s-1]
 sql = thermo.variables['ql'][:, :]          #Liquid water [kg kg-1]
-sthl = thermo.variables['thl'][:, :]        #Liquid water potential temperature
+thl = thermo.variables['thl'][:, :]        #Liquid water potential temperature
 sqt = thermo.variables['qt'][:, :]          #Total water mixing ratio
 areat = default.variables['area'][:, :]
 sqlpath = thermo.variables['ql_path'][:]    #[kg m-2]
-area = np.mean(areat[:,:], 0)
 cft = thermo.variables["ql_frac"][:]
 snr = thermo.variables["nr"][:, :]		#number density rain [m-3]
 trr = thermo.variables["rr"][:]
 sqr = thermo.variables["qr_path"][:]		#rain water path [kg m-2]
+bld = thermo.variables['zi'][:]		#boundary layer depth [m]
 ql = np.sum(areat[:,:]*sql[:,:], 0) / np.sum(areat[:,:], 0)
 cf = np.sum(areat[:,:]*cft[:,:], 0) / np.sum(areat[:,:], 0)
 
@@ -41,15 +37,18 @@ cft[cft==0] = np.nan
 cf[cf==0] = np.nan
 sql[sql==0] = np.nan
 snr[snr==0] = np.nan
+thlf[thlf==0] = np.nan
+
 
 start, end = 0, len(t)
 
 
-
 #mean and std over the horizontal axis(time)
+thl_mean = np.mean(thl[:,:], 0)
 sql_error = np.nanstd(sql[:,:], 0)	
 sql_mean = np.nanmean(sql[:,:], 0)
 snr_mean = np.nanmean(snr[:,:], 0)
+thlf_mean = np.nanmean(thlf[:,:], 0)
 
 #Finds the index of the max value 
 ind = np.unravel_index(np.nanargmax(sql_mean), sql_mean.shape)
@@ -91,20 +90,49 @@ plt.plot(cf, z)
 plt.xlabel('cloud fraction [-]')
 plt.ylabel('z [m]')
 
-plt.figure(figsize=(10,5))
+plt.figure()
+plt.plot(thlf_mean, zh, label ='flux of temperature')
+plt.xlabel('Thl_flux [K m s$^{-1}$]')
+plt.ylabel('z[m]')
+plt.legend()
+
+plt.figure()
+plt.plot(t, np.nanmean(thlf[:,:], 1))
+plt.xlabel('time [s]')
+plt.ylabel('Thl_flux [K m s$^{-1}$]')
+
+
+plt.figure()
+plt.plot(t, bld, label ='boundary layer depth')
+plt.xlabel('time[s]')
+plt.ylabel('zi [m]')
+plt.legend()
+
+fig, ax = plt.subplots()
+ax.plot(t, bld, label ='boundary layer depth', color='black')
+ax.set_xlabel('time [s]')
+ax.set_ylabel('zi [m]')
+ax2 = ax.twinx()
+ax2.plot(t, np.nanmean(thlf[:,:], 1), label='temperature flux')
+ax2.set_ylabel('Thl_flux [K m s$^{-1}$]')
+ax.grid()
+
+
+
+
+
+print("Average value of LWP is {:.3f} g m-2 ".format(np.mean(sqlpath)))
+print("Average value of RWP is {:e} g m-2 ".format(np.mean(sqr)))
+print("Average value of ql is {:.2f} g m-3 with the highest amount at z={:g} m".format(np.nanmean(sql_mean), z[ind]))
+print("Average cloud cover is {:.2f}%".format(np.nanmean(cf)*100))
+'''
+plt.subplot(221)
 plt.plot(snr_mean, z, label = 'number density rain')
 plt.xlabel('n$_r$ [m$^{-3}$]')
 plt.ylabel('z [m]')
 plt.title('Nr')
 plt.legend()
 
-
-
-print("Highest value of LWP is {:.3f} g m-2 ".format(np.max(sqlpath)))
-print("Highest value of RWP is {:e} g m-2 ".format(np.max(sqr)))
-print("Highest value of ql is {:.2f} g m-3 at z={:g} m".format(np.nanmax(sql_mean), z[ind]))
-print("Maximum cloud cover is {:.2f}%".format(np.nanmax(cf)*100))
-'''
 #plt.figure(figsize=(10,5))
 plt.subplot(224)
 plt.plot(t, trr, 'b-', label = 'mean surface rain rate')
