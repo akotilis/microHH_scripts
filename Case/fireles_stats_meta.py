@@ -64,8 +64,13 @@ zi = bld[ind1]
 normz = z/zi
 normzh= zh/zi
 
-
 norm_thlf = thlf/thlf[0,0]		#normalized kinematic heat flux (thl_bot=0.3)
+
+flux_check=np.zeros([end])
+for n in range(start,end):
+	flux_check[n] = (thlf[n,1]/zi)*27000
+	
+
 
 #hourly development of the potential temperature profile
 plt.figure()
@@ -96,6 +101,13 @@ plt.plot(t, thlf[:,1], label='100m height heat flux')
 plt.xlabel('time [s]')
 plt.ylabel("w'θ' [K m s$^{-1}$]")
 plt.legend()
+
+plt.figure()
+plt.plot(t, flux_check, label='100m height heat flux validation')
+plt.xlabel('time [s]')
+plt.ylabel("w'θ' [K m s$^{-1}$]")
+plt.legend()
+
 
 gamma = 0.0004
 bowr= gamma*thlbot/qtbot
