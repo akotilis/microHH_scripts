@@ -72,6 +72,13 @@ for n in range(start,end):
 	
 
 
+plt.figure()
+plt.plot(np.mean(norm_thlf[:,:],0), normzh, label='normalized kinematic heat flux')
+plt.ylabel('z/zi')
+plt.xlabel('$θ/Qs$ [K]')
+plt.title(' normalized kinematic heat flux')
+plt.legend()
+
 #hourly development of the potential temperature profile
 plt.figure()
 for n in range(start, 73, step):
@@ -86,7 +93,7 @@ for n in range(start, end, step):
 	plt.plot(norm_thlf[n,:], normzh, label = 't={:g}h'.format(t[n]/3600))
 #plt.plot(norm_thlf[73,:], normzh, label= 't={:g}h'.format(t[73]/3600))
 plt.ylabel('z/zi')
-plt.xlabel('$θ$ [K]')
+plt.xlabel('$θ/Qs$')
 plt.title('Hourly normalized kinematic heat flux')
 plt.legend()
 
