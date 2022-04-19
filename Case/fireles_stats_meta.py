@@ -12,6 +12,8 @@ z = stats.variables['z'][:]
 zh = stats.variables['zh'][:]
 
 thlf = thermo.variables['thl_flux'][:, :]  #flux of the Liq water potential temperature[K m s-1]
+qtf = thermo.variables['qt_flux'][:,:] 	#flux of water mixing ratio [kg kg-1 m s-1]
+rh = thermo.variables['rh'][:, :]		#relative humidity
 sql = thermo.variables['ql'][:, :]          #Liquid water [kg kg-1]
 thl = thermo.variables['thl'][:, :]        #Liquid water potential temperature
 sqt = thermo.variables['qt'][:, :]          #Total water mixing ratio
@@ -22,6 +24,8 @@ snr = thermo.variables["nr"][:, :]		#number density rain [m-3]
 trr = thermo.variables["rr"][:]
 sqr = thermo.variables["qr_path"][:]		#rain water path [kg m-2]
 bld = thermo.variables['zi'][:]		#boundary layer depth [m]
+qtbot = thermo.variables['qt_bot'][:]		#surface total water mixing ratio [kg kg-1]
+thlbot = thermo.variables['thl_bot'][:] 	#surface potential temperature [K]
 ql = np.sum(areat[:,:]*sql[:,:], 0) / np.sum(areat[:,:], 0)
 cf = np.sum(areat[:,:]*cft[:,:], 0) / np.sum(areat[:,:], 0)
 
@@ -41,7 +45,7 @@ thlf[thlf==0] = np.nan
 
 
 start, end = 0, len(t)
-
+step = 12
 
 #mean and std over the horizontal axis(time)
 thl_mean = np.mean(thl[:,:], 0)
@@ -49,9 +53,68 @@ sql_error = np.nanstd(sql[:,:], 0)
 sql_mean = np.nanmean(sql[:,:], 0)
 snr_mean = np.nanmean(snr[:,:], 0)
 thlf_mean = np.nanmean(thlf[:,:], 0)
+rh_mean = np.mean(rh[:,:], 0)
 
 #Finds the index of the max value 
 ind = np.unravel_index(np.nanargmax(sql_mean), sql_mean.shape)
+ind1 = np.unravel_index(np.argmax(bld), bld.shape)
+
+#max BL height and normalizing
+zi = bld[ind1]
+normz = z/zi
+normzh= zh/zi
+
+
+norm_thlf = thlf/thlf[0,0]		#normalized kinematic heat flux (thl_bot=0.3)
+
+#hourly development of the potential temperature profile
+plt.figure()
+for n in range(start, 73, step):
+	plt.plot(thl[n,:], z, label = 't={:g}h'.format(t[n]/3600))
+plt.ylabel('z [m]')
+plt.xlabel('$θ$ [K]')
+plt.title('Hourly Potential temperature profile')
+plt.legend()
+
+plt.figure()
+for n in range(start, end, step):
+	plt.plot(norm_thlf[n,:], normzh, label = 't={:g}h'.format(t[n]/3600))
+#plt.plot(norm_thlf[73,:], normzh, label= 't={:g}h'.format(t[73]/3600))
+plt.ylabel('z/zi')
+plt.xlabel('$θ$ [K]')
+plt.title('Hourly normalized kinematic heat flux')
+plt.legend()
+
+plt.figure()
+plt.plot(t, thl[:,0], label='50m temp')
+plt.xlabel('time [s]')
+plt.ylabel('Temperature [K]')
+plt.legend()
+
+plt.figure()
+plt.plot(t, thlf[:,1], label='100m height heat flux')
+plt.xlabel('time [s]')
+plt.ylabel("w'θ' [K m s$^{-1}$]")
+plt.legend()
+
+gamma = 0.0004
+bowr= gamma*thlbot/qtbot
+bownr = gamma*thlf[:,0]/qtf[:,0]
+bowrm = np.mean(bownr)
+
+plt.figure()
+plt.plot(t, bowr, label='surface bowen ratio')
+plt.xlabel('time [s]')
+plt.ylabel('Bowen ratio')
+plt.legend()
+'''
+plt.figure()
+plt.plot(t, bowr[:,0], label='50m')
+plt.plot(t, bowr[:,1], label='100m')
+plt.plot(t, bowr[:,10], label='1000m')
+plt.xlabel('time [s]')
+plt.ylabel('Bowen ratio(-)')
+plt.legend()
 
 
 #Plot
@@ -96,10 +159,9 @@ plt.xlabel('Thl_flux [K m s$^{-1}$]')
 plt.ylabel('z[m]')
 plt.legend()
 
-plt.figure()
-plt.plot(t, np.nanmean(thlf[:,:], 1))
-plt.xlabel('time [s]')
-plt.ylabel('Thl_flux [K m s$^{-1}$]')
+
+
+
 
 
 plt.figure()
@@ -107,6 +169,12 @@ plt.plot(t, bld, label ='boundary layer depth')
 plt.xlabel('time[s]')
 plt.ylabel('zi [m]')
 plt.legend()
+
+plt.figure()
+plt.plot(rh_mean, z)
+
+plt.figure()
+plt.plot(t, np.mean(rh[:,:], 1))
 
 fig, ax = plt.subplots()
 ax.plot(t, bld, label ='boundary layer depth', color='black')
@@ -125,7 +193,7 @@ print("Average value of LWP is {:.3f} g m-2 ".format(np.mean(sqlpath)))
 print("Average value of RWP is {:e} g m-2 ".format(np.mean(sqr)))
 print("Average value of ql is {:.2f} g m-3 with the highest amount at z={:g} m".format(np.nanmean(sql_mean), z[ind]))
 print("Average cloud cover is {:.2f}%".format(np.nanmean(cf)*100))
-'''
+
 plt.subplot(221)
 plt.plot(snr_mean, z, label = 'number density rain')
 plt.xlabel('n$_r$ [m$^{-3}$]')
