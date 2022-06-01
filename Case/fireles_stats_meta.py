@@ -91,7 +91,7 @@ plt.legend()
 plt.figure()
 for n in range(start, end, step):
 	plt.plot(norm_thlf[n,:], normzh, label = 't={:g}h'.format(t[n]/3600))
-#plt.plot(norm_thlf[73,:], normzh, label= 't={:g}h'.format(t[73]/3600))
+#plt.plot(norm_thlf[73,:], normzh, label= 't={:g}h'.format(t[73]/3600)thlfthlf)
 plt.ylabel('z/zi')
 plt.xlabel('$θ/Qs$')
 plt.title('Hourly normalized kinematic heat flux')
